@@ -36,7 +36,7 @@ defmodule Quetzal.LiveView do
 
   ## Example:
 
-  This example generates a random number and push to live view so Quetzal updates the component in the view :scream:
+  This example generates a random number and push to live view so Quetzal updates the component in the view:
 
       defmodule AppWeb.PieLive do
         use Quetzal.LiveView
@@ -45,15 +45,15 @@ defmodule Quetzal.LiveView do
         def components() do
           Quetzal.Graph.pie [id: "my-pie-graph"], [labels: ["RED", "BLUE"], values: [20, 10]]
         end
-      end
 
-      def trigger_update() do
-        :timer.sleep(5000)
-        r = :rand.uniform(100)
-        b = :rand.uniform(100)
-        component = Quetzal.Graph.pie [id: "my-pie-graph"], [labels: ["R", "B"], values: [r, b]]
-        update_components(component)
-        trigger_update()
+        def trigger_update() do
+          :timer.sleep(5000)
+          r = :rand.uniform(100)
+          b = :rand.uniform(100)
+          component = Quetzal.Graph.pie [id: "my-pie-graph"], [labels: ["RED", "BLUE"], values: [r, b]]
+          update_components(component) # this will update the graph
+          trigger_update()
+        end
       end
   """
 
