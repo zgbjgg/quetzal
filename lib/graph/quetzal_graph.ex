@@ -20,7 +20,7 @@ defmodule Quetzal.Graph do
     # in pie search values and labels as datasource
     values = Keyword.get(options, :values, [])
     labels = Keyword.get(options, :labels, [])
-    opts_as_json =Jason.encode!([%{"values" => values, "labels" => labels, "type" => "pie"}]) 
+    opts_as_json = Jason.encode!([%{"values" => values, "labels" => labels, "type" => "pie"}])
     build_graph(component_opts, opts_as_json)
   end
   def plotly_graph(_, _, _) do
@@ -32,8 +32,8 @@ defmodule Quetzal.Graph do
     style = Keyword.get(component_opts, :style, "")
     class = Keyword.get(component_opts, :class, "")
     """
-    #{ html_tag(id, style, class) }
-    #{ js_tag(id, options) }
+    #{ html_tag(id, style, class, options) }
+    #{ js_tag(id) }
     """
   end
 
@@ -41,8 +41,8 @@ defmodule Quetzal.Graph do
   EEx.function_from_string(
     :def,
     :html_tag,
-    ~s[<div id="<%= id %>" style="<%= style %>" class="<%= class %>"></div>],
-    ~w(id style class)a
+    ~s[<div phx-hook="Graph" id="<%= id %>" style="<%= style %>" class="<%= class %>" options='<%= options %>'></div>],
+    ~w(id style class options)a
   )
 
   # EEx template for script to create graph
@@ -50,9 +50,11 @@ defmodule Quetzal.Graph do
     :def,
     :js_tag,
     ~s[<script>
-         ID = document.getElementById('<%= id %>');
-         Plotly.plot(ID, <%= options %>)
+         fn_<%= id %> = new Function("ID = document.getElementById('<%= id %>');" +
+           "OPTS = ID.getAttribute('options');" +
+           "Plotly.react(ID, JSON.parse(OPTS));");
+         fn_<%= id %>()
        </script>],
-    ~w(id options)a
+    ~w(id)a
   )
 end
