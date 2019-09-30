@@ -1,18 +1,18 @@
 defmodule Quetzal do
   @moduledoc """
-  Documentation for Quetzal.
+  Quetzal - Analytical web apps, beautiful, fast and easy using Elixir. No Javascript required.
   """
 
   @doc """
-  Hello world.
+  Generates a child spec for Quetzal registry, it requires the name into the keywords.
 
-  ## Examples
+  ## Example
 
-      iex> Quetzal.hello()
-      :world
+  Include into your supervision tree:
+
+  `{Quetzal, name: Quetzal.Registry}`
 
   """
-  def hello do
-    :world
-  end
+  @spec child_spec(keyword) :: Supervisor.child_spec()
+  defdelegate child_spec(options), to: Quetzal.Supervisor
 end
