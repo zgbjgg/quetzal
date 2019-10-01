@@ -85,16 +85,18 @@ defmodule Quetzal do
 
   * The hooks should be configured into your app.js file.
 
+  * Layouts should include `plotly.js` if you plan to use graphs (can be included from CDN).
+
   * Ensure that quetzal hooks are included in the package.json:
 
-      ...
-      "dependencies": {
-        "phoenix": "file:../deps/phoenix",
-        "phoenix_html": "file:../deps/phoenix_html",
-        "phoenix_live_view": "file:../deps/phoenix_live_view",
-        "quetzal_hooks": "file:../../quetzal"
-      },
-      ...
+        ...
+        "dependencies": {
+          "phoenix": "file:../deps/phoenix",
+          "phoenix_html": "file:../deps/phoenix_html",
+          "phoenix_live_view": "file:../deps/phoenix_live_view",
+          "quetzal_hooks": "file:../../quetzal"
+        },
+        ...
 
   That's all, we are working to add more examples of components, inputs etc. Enjoy!.
 
