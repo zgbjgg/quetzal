@@ -11,20 +11,19 @@ defmodule Quetzal.Graph do
     end
   end
 
-  Enum.map(~w(pie)a, graph)
+  Enum.map(~w(graph)a, graph)
 
   @doc """
   Returns the component that holds the graph and their data holding into a single EEx template
   """
-  def plotly_graph(:pie, component_opts, options) do
-    # in pie search values and labels as datasource
-    values = Keyword.get(options, :values, [])
-    labels = Keyword.get(options, :labels, [])
-    opts_as_json = Jason.encode!([%{"values" => values, "labels" => labels, "type" => "pie"}])
-    build_graph(component_opts, opts_as_json)
+  def plotly_graph(:graph, component_opts, options) do
+    # options should be a valid JSON to encode with Jason, so, for example, all plotlyjs
+    # data examples will be passed as json here and rendered by EEx template.
+    opts = options |> Jason.encode!
+    build_graph(component_opts, opts)
   end
   def plotly_graph(_, _, _) do
-    {:error, :graph_not_supported}
+    :error
   end
 
   defp build_graph(component_opts, options) do
