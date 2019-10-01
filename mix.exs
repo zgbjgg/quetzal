@@ -1,13 +1,20 @@
 defmodule Quetzal.MixProject do
   use Mix.Project
 
+  @version "0.1.1"
+
   def project do
     [
       app: :quetzal,
-      version: "0.1.0",
+      version: "0.1.1",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      package: package(),
+      deps: deps(),
+      docs: docs(),
+      description: """
+      Analytical web apps, beautiful, fast and easy using Elixir. No Javascript required.
+      """
     ]
   end
 
@@ -22,7 +29,26 @@ defmodule Quetzal.MixProject do
   defp deps do
     [
       {:jason, "~> 1.1"},
-      {:phoenix_live_view, "~> 0.3.0"}
+      {:phoenix_live_view, "~> 0.3.0"},
+      {:ex_doc, "~> 0.20", only: :docs}
+    ]
+  end
+
+  defp docs do
+    [
+      main: "Quetzal",
+      source_ref: "v#{@version}",
+      source_url: "https://github.com/zgbjgg/quetzal"
+    ]
+  end
+
+  defp package do
+    [
+      maintainers: ["Jorge Garrido"],
+      licenses: ["MIT"],
+      links: %{github: "https://github.com/zgbjgg/quetzal"},
+      files:
+        ~w(lib priv LICENSE mix.exs package.json README.md)
     ]
   end
 end
