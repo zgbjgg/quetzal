@@ -26,7 +26,7 @@ defmodule Quetzal.LiveView do
 
         @impl Quetzal.LiveView
         def components() do
-          Quetzal.Graph.pie [id: "my-pie-graph"], [labels: ["RED", "BLUE"], values: [20, 10]]
+          Quetzal.Graph.graph [id: "mypiegraph"], [type: "pie", labels: ["RED", "BLUE"], values: [20, 10]]
         end
       end
 
@@ -43,14 +43,14 @@ defmodule Quetzal.LiveView do
 
         @impl Quetzal.LiveView
         def components() do
-          Quetzal.Graph.pie [id: "my-pie-graph"], [labels: ["RED", "BLUE"], values: [20, 10]]
+          Quetzal.Graph.graph [id: "mypiegraph"], [type: "pie", labels: ["RED", "BLUE"], values: [20, 10]]
         end
 
         def trigger_update() do
           :timer.sleep(5000)
           r = :rand.uniform(100)
           b = :rand.uniform(100)
-          component = Quetzal.Graph.pie [id: "my-pie-graph"], [labels: ["RED", "BLUE"], values: [r, b]]
+          component = Quetzal.Graph.graph [id: "mypiegraph"], [type: "pie", labels: ["RED", "BLUE"], values: [r, b]]
           update_components(component) # this will update the graph
           trigger_update()
         end
@@ -59,37 +59,77 @@ defmodule Quetzal.LiveView do
 
   defmacro __using__(opts) do
     quote do
-      use Phoenix.LiveView, unquote(opts)
+      use Phoenix.LiveView
 
       import unquote(__MODULE__)
       @behaviour unquote(__MODULE__)
 
       def render(var!(assigns)) do
-       ~L"""
-       <%= Phoenix.HTML.raw @components %> 
-       """
+        ~L"""
+        <%= Phoenix.HTML.raw @raw_components %> 
+        """
       end
 
       def mount(_session, socket) do
         Registry.register(Quetzal.Registry, "PID", [])
-        {:ok, assign(socket, :components, components())}
+
+        socket = socket
+        |> assign(:components, components())
+        |> assign(:raw_components, """
+            #{raw_components(components())}
+          """)
+        {:ok, socket}
       end
 
-      def handle_event(event, params,socket) do
-        handle_component_event(event, params, socket)
+      def handle_event(event, params, socket) do
+        # instead delivery to callback, send a message to callback process
+        # and allow delivery to custom definition implemented
+        eval = :gen_server.call(Quetzal.Callback, {:dispatch, unquote(opts), event, params})
+        socket = case eval do
+          {:error, :no_callback_matches}  ->
+            socket
+          [{output, component, property}] ->
+            # change property in component so we can assign items again to
+            # allow live view server performs an update
+            components = socket.assigns[:components]
+            |> Enum.map(fn {t, opts} ->
+                 id = opts[:id]
+                 case id == component do
+                   true  -> {t, opts |> Keyword.put(property, output)}
+                   false -> {t, opts}
+                 end
+            end)
+
+            socket
+            |> assign(:components, components)
+            |> assign(:raw_components, """
+                #{raw_components(components)}
+              """)
+          _ ->
+            socket # there is some error thrown by callback
+        end
+        {:noreply, socket}
       end
 
-      def handle_info({:upgrade, components}, socket) do
-        {:noreply, assign(socket, :components, components)}
+      def handle_info({:upgrade, components, raw_components}, socket) do
+        socket = socket
+        |> assign(:components, components)
+        |> assign(:raw_components, raw_components)
+        {:noreply, socket}
       end
       def handle_info(_, socket) do
         {:noreply, socket}
       end
+
+      defp raw_components(components) do
+        # since components are passed trough a single config, mask it as html tags
+        components
+        |> Enum.map(fn {render, options} ->
+             render.html_tag(options)
+        end)
+      end
     end
   end
-
-  @callback handle_component_event(event :: binary, unsigned_params :: map, socket :: Socket.t()) ::
-    {:noreply, Socket.t()} | {:stop, Socket.t()}
 
   @callback components() :: any()
 
@@ -99,7 +139,7 @@ defmodule Quetzal.LiveView do
 
   ## Example:
 
-      update_components(Quetzal.Graph.pie [id: "my-pie-graph"], [labels: ["RED", "BLUE"], values: [20, 10]])
+      update_components(Quetzal.Graph.graph [id: "mypiegraph"], [type: "pie", labels: ["RED", "BLUE"], values: [20, 10]])
 
   """ 
   def update_components(components) do
