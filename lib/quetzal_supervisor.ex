@@ -20,6 +20,7 @@ defmodule Quetzal.Supervisor do
 
     children = [
       {Registry, registry},
+      {Quetzal.Callback, []}
     ]
 
     Supervisor.init(children, strategy: :rest_for_one)
