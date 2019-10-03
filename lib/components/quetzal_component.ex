@@ -13,15 +13,14 @@ defmodule Quetzal.Component do
 
       defmodule MyComponent.Text do
         use Quetzal.Component,
-          keyup: "value",
-          target: "window",
           tag: "input"
+          type: "text"
       end
 
   And let's use in this way:
 
-      iex(10)> MyComponent.Text.html_tag([id: "mytext", type: "text"])
-      "<input id=\"mytext\" type=\"text\" phx-keyup=\"value\" phx-target=\"window\"></input>"
+      iex(10)> MyComponent.Text.html_tag([id: "mytext"])
+      "<input id=\"mytext\" type=\"text\" phx-change=\"mytext\"></input>"
   """
 
   defmacro __using__(opts) do
@@ -42,6 +41,9 @@ defmodule Quetzal.Component do
 
         # get options from use
         tag = if opts[:tag] == nil do :missing else opts[:tag] end
+        type = if opts[:type] == nil do "" else opts[:type] end
+
+        # those are events for keyup, be careful when using it, not supported all features
         keyup = opts[:keyup]
         target = opts[:target]
 
@@ -50,10 +52,12 @@ defmodule Quetzal.Component do
           _        ->
             # children as opt should be render as is
             children = Keyword.get(options, :children, "")
+
             options = options
             |> Keyword.put(:"phx-keyup", keyup)
             |> Keyword.put(:"phx-target", target)
             |> Keyword.put(:"phx-change", options[:id])
+            |> Keyword.put(:type, type)
             |> Keyword.delete(:children)
             |> Enum.map(fn {_, nil} ->
                  ""
