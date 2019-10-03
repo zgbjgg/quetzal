@@ -15,7 +15,7 @@ defmodule Quetzal do
   * It tracks events from components and receives in the live view to
     update live view components.
 
-  ## Example
+  ## Using components
 
   First, define a module and use `Quetzal.LiveView`, you don't need `mount/2` or `render/1`,
   when using the Quetzal Live View all is done:
@@ -38,6 +38,8 @@ defmodule Quetzal do
 
   The callback returns a new graph component and put into the view the necessary items
   to work with it.
+
+  ## Live updates
 
   Now, we are going to the real-time cases, let's say we want update our pie graph when an
   event occurs in the server, so let's define a trigger to make it:
@@ -78,6 +80,40 @@ defmodule Quetzal do
 
   With this minimal configuration, we able to make a real-time app that updates the graph from the
   live view server.
+
+  ## Live updates with callbacks
+
+  Quetzal supports callbacks to deliver when a data has changed in a form, and then performs some update
+  in the components, let's inspect the next code:
+
+      defmodule AppWeb.LiveView do
+        use Quetzal.LiveView,
+          handler: __MODULE__,
+          callbacks: [:update_output_div]
+
+        @impl Quetzal.LiveView
+        def components() do
+          [{Quetzal.Form, [id: "myform", name: "myform",
+             children: [{Quetzal.InputText, [id: "mytext", value: "", type: "text", name: "mytext"]}]
+           ]},
+          {Quetzal.Div, [id: "mydiv", style: "", children: ""]}]
+        end
+
+        def update_output_div("myform", "mytext", value) do
+          {["You've entered #{value} value", "border-style: dotted;"], "mydiv", [:children, :style]}
+        end
+      end
+
+  First define the handler and the callbacks, the handler is a module that will process the events, and the
+  callbacks are a list of functions in that module, so when an events occurs then that callbacks will be called.
+
+  In the components we are defining a single form with an input and a div, so when something changes in the
+  input the live view server will send an update to the view and render the new children for the div.
+
+  The callbacks receive always 3 arguments, the first is the name of the form containing the components firing the event,
+  the second is the match against the component changed and the third is the value of that component.
+
+  ## Notes
 
   Some notes that you should be take:
 
