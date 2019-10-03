@@ -53,6 +53,7 @@ defmodule Quetzal.Component do
             options = options
             |> Keyword.put(:"phx-keyup", keyup)
             |> Keyword.put(:"phx-target", target)
+            |> Keyword.put(:"phx-change", options[:id])
             |> Keyword.delete(:children)
             |> Enum.map(fn {_, nil} ->
                  ""
