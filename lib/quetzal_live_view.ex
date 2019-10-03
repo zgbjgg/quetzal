@@ -131,7 +131,14 @@ defmodule Quetzal.LiveView do
         # since components are passed trough a single config, mask it as html tags
         components
         |> Enum.map(fn {render, options} ->
-             render.html_tag(options)
+             options = case Keyword.keyword?(options) do
+               true  -> raw_components(options)
+               false -> options
+             end
+             case Code.ensure_compiled?(render) do
+               true  -> render.html_tag(options)
+               false -> {render, options}
+             end
         end)
       end
     end
