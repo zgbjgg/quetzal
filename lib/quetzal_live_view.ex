@@ -88,14 +88,20 @@ defmodule Quetzal.LiveView do
         socket = case eval do
           {:error, :no_callback_matches}  ->
             socket
-          [{output, component, property}] ->
+          [{outputs, component, properties}] ->
             # change property in component so we can assign items again to
             # allow live view server performs an update
             components = socket.assigns[:components]
             |> Enum.map(fn {t, opts} ->
                  id = opts[:id]
                  case id == component do
-                   true  -> {t, opts |> Keyword.put(property, output)}
+                   true  ->
+                     opts_to_update = Enum.zip(properties, outputs)
+                     opts = opts
+                     |> Enum.map(fn {property, output} ->
+                          {property, opts_to_update |> Keyword.get(property, output)}
+                     end)
+                     {t, opts}
                    false -> {t, opts}
                  end
             end)
