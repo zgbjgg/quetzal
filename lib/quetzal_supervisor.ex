@@ -1,4 +1,14 @@
 defmodule Quetzal.Supervisor do
+  @moduledoc """
+  A simple supervisor to start the registry and callback processes
+
+  Just include into your app tree supervision:
+
+  # Example
+
+      `{Quetzal, name: Quetzal.Registry}`
+
+  """
   use Supervisor
 
   def start_link(opts) do
