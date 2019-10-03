@@ -17,7 +17,7 @@ defmodule Quetzal do
 
   ## Example
 
-  Firts, define a module and use `Quetzal.LiveView`, you don't need `mount/2` or `render/1`,
+  First, define a module and use `Quetzal.LiveView`, you don't need `mount/2` or `render/1`,
   when using the Quetzal Live View all is done:
 
       defmodule AppWeb.PieLive do
@@ -32,7 +32,7 @@ defmodule Quetzal do
 
         @impl Quetzal.LiveView
         def components() do
-          Quetzal.Graph.pie [id: "my-pie-graph"], [labels: ["RED", "BLUE"], values: [1, 2]]
+          Quetzal.Graph.graph [id: "my-pie-graph"], [type: "pie", labels: ["RED", "BLUE"], values: [1, 2]]
         end
       end
 
@@ -47,14 +47,14 @@ defmodule Quetzal do
 
         @impl Quetzal.LiveView
         def components() do
-          Quetzal.Graph.pie [id: "my-pie-graph"], [labels: ["RED", "BLUE"], values: [1, 2]]
+          Quetzal.Graph.graph [id: "my-pie-graph"], [type: "pie", labels: ["RED", "BLUE"], values: [1, 2]]
         end
 
         def trigger_update() do
           :timer.sleep(5000)
           r = :rand.uniform(100)
           b = :rand.uniform(100)
-          component = Quetzal.Graph.pie [id: "TEST"], [labels: ["RED", "BLUE"], values: [r, b]]
+          component = Quetzal.Graph.graph [id: "TEST"], [type: "pie", labels: ["RED", "BLUE"], values: [r, b]]
           update_components(component)
           trigger_update()
         end
