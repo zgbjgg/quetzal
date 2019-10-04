@@ -95,16 +95,15 @@ defmodule Quetzal.LiveView do
             |> Enum.map(fn {t, opts} ->
                  id = opts[:id]
                  case id == component do
-                   true  ->
-                     opts_to_update = Enum.zip(properties, outputs)
-                     opts = opts
-                     |> Enum.map(fn {property, output} ->
-                          {property, opts_to_update |> Keyword.get(property, output)}
-                     end)
-                     {t, opts}
+                   true  -> {t, update_opts(opts, properties, outputs)}
                    false -> {t, opts}
                  end
-              {t, copts, opts} -> {t, copts, opts}
+              {t, component_opts, opts} ->
+                id = component_opts[:id]
+                case id == component do
+                  true  -> {t, component_opts, update_opts(opts, properties, outputs)}
+                  false -> {t, component_opts, opts}
+                end
             end)
 
             socket
@@ -142,6 +141,14 @@ defmodule Quetzal.LiveView do
              end
            {render, component_opts, options} -> # render graphs
              render.graph(component_opts, options)
+        end)
+      end
+
+      defp update_opts(opts, properties, outputs) do
+        opts_to_update = Enum.zip(properties, outputs)
+        opts
+        |> Enum.map(fn {property, output} ->
+          {property, opts_to_update |> Keyword.get(property, output)}
         end)
       end
     end
