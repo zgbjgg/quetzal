@@ -1,6 +1,17 @@
 defmodule Quetzal.Graph do
   @doc """
   The base module to make graph components based on plotly.js
+
+  In order to make components provide two keywords, the first one contains the
+  div properties and the second the keywords to use as data in PlotlyJS, with this
+  you are able to build any graph supported into PlotlyJS.
+
+  # Example
+
+      [{Quetzal.Graph, [id: "mygraph"], [type: "pie", values: [1,2], labels: ["A", "B"]]}]
+
+  The above code can be set as a single component in the live view to render as graph.
+
   """
   require EEx
 
@@ -19,7 +30,8 @@ defmodule Quetzal.Graph do
   def plotly_graph(:graph, component_opts, options) do
     # options should be a valid JSON to encode with Jason, so, for example, all plotlyjs
     # data examples will be passed as json here and rendered by EEx template.
-    opts = options |> Jason.encode!
+    opts = options |> Enum.into(%{})
+    opts = [opts] |> Jason.encode!
     build_graph(component_opts, opts)
   end
   def plotly_graph(_, _, _) do
