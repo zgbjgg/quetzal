@@ -100,7 +100,7 @@ defmodule Quetzal do
         end
 
         def update_output_div("myform", "mytext", value) do
-          {["You've entered #{value} value", "border-style: dotted;"], "mydiv", [:children, :style]}
+          {["You've entered \#\{value\} value", "border-style: dotted;"], "mydiv", [:children, :style]}
         end
       end
 
