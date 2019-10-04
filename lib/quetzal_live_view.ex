@@ -104,6 +104,7 @@ defmodule Quetzal.LiveView do
                      {t, opts}
                    false -> {t, opts}
                  end
+              {t, copts, opts} -> {t, copts, opts}
             end)
 
             socket
@@ -139,6 +140,8 @@ defmodule Quetzal.LiveView do
                true  -> render.html_tag(options)
                false -> {render, options}
              end
+           {render, component_opts, options} -> # render graphs
+             render.graph(component_opts, options)
         end)
       end
     end
