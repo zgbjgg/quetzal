@@ -37,6 +37,8 @@ defmodule Quetzal.Callback do
              {:error, error}
          end
     end)
+    |> :lists.append
+
     {:reply, output, state}
   end
 end
