@@ -1,6 +1,6 @@
 # Quetzal
 
-**Quetzal - Analytical web apps, beautiful, fast and easy using Elixir. No Javascript required.**
+**Quetzal - Analytical web apps, beautiful, fast, easy and real-time using Elixir. No Javascript required.**
 
 [![Hex.pm](https://img.shields.io/hexpm/v/quetzal.svg)](https://hex.pm/packages/quetzal)
 
