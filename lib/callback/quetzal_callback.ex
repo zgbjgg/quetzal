@@ -15,11 +15,17 @@ defmodule Quetzal.Callback do
   @impl true
   def handle_call({:dispatch, opts, event, params}, _from, state) do
     # get target changed and get its value from params
-    [target|_] = params |> Map.get("_target")
-    value = params |> Map.get(target)
+    [target|_] = params
+    |> Map.get("_target")
+
+    # since targets could be wrapped in a form, send all changes
+    # in order to allow clients to use cascade updates
+    values = params
+    |> Map.delete("_target")
+    |> Map.values
 
     # build arguments
-    args = [event, target, value]
+    args = [event, target, values]
 
     # get module and functions to call
     mod = opts[:handler]
