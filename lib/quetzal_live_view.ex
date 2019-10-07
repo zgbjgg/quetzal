@@ -70,13 +70,13 @@ defmodule Quetzal.LiveView do
         """
       end
 
-      def mount(_session, socket) do
+      def mount(session, socket) do
         Registry.register(Quetzal.Registry, "PID", [])
 
         socket = socket
-        |> assign(:components, components())
+        |> assign(:components, components(session))
         |> assign(:raw_components, """
-            #{raw_components(components())}
+            #{raw_components(components(session))}
           """)
         {:ok, socket}
       end
@@ -154,7 +154,7 @@ defmodule Quetzal.LiveView do
     end
   end
 
-  @callback components() :: any()
+  @callback components(session :: map) :: any()
 
   @doc """
   Updates the components sending a message to live view,
