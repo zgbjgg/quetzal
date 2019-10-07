@@ -42,16 +42,17 @@ defmodule Quetzal.LiveView do
         use Quetzal.LiveView
 
         @impl Quetzal.LiveView
-        def components() do
-          Quetzal.Graph.graph [id: "mypiegraph"], [type: "pie", labels: ["RED", "BLUE"], values: [20, 10]]
+        def components(_session) do
+          [{Quetzal.Graph, [id: "mypie"], [type: "pie", labels: ["Red", "Blue"], values: [10, 20]]}]
         end
 
         def trigger_update() do
           :timer.sleep(5000)
-          r = :rand.uniform(100)
-          b = :rand.uniform(100)
-          component = Quetzal.Graph.graph [id: "mypiegraph"], [type: "pie", labels: ["RED", "BLUE"], values: [r, b]]
-          update_components(component) # this will update the graph
+          white = :rand.uniform(100)
+          black = :rand.uniform(100)
+          gray = :rand.uniform(100)
+          components = [mypie: [labels: ["Black", "White", "Gray"], values: [black, white, gray]]]
+          update_components(components)
           trigger_update()
         end
       end
@@ -92,21 +93,7 @@ defmodule Quetzal.LiveView do
             # change property in component so we can assign items again to
             # allow live view server performs an update
             components = socket.assigns[:components]
-            |> Enum.map(fn {t, opts} ->
-                 id = opts[:id] |> String.to_atom
-                 properties = outputs |> Keyword.get(id, nil)
-                 case properties do
-                   nil -> {t, opts}
-                   properties -> {t, update_opts(opts, properties)}
-                 end
-              {t, component_opts, opts} ->
-                id = component_opts[:id] |> String.to_atom
-                properties = outputs |> Keyword.get(id, nil)
-                case properties do
-                  nil -> {t, component_opts, opts}
-                  properties  -> {t, component_opts, update_opts(opts, properties)}
-                end
-            end)
+            |> render_new_components(outputs)
 
             socket
             |> assign(:components, components)
@@ -119,14 +106,38 @@ defmodule Quetzal.LiveView do
         {:noreply, socket}
       end
 
-      def handle_info({:upgrade, components, raw_components}, socket) do
+      def handle_info({:upgrade, new_components}, socket) do
+        components = socket.assigns[:components]
+        |> render_new_components(new_components)
+
         socket = socket
         |> assign(:components, components)
-        |> assign(:raw_components, raw_components)
+        |> assign(:raw_components, """
+             #{raw_components(components)}
+          """)
         {:noreply, socket}
       end
       def handle_info(_, socket) do
         {:noreply, socket}
+      end
+
+      defp render_new_components(components, new_components) do
+        components
+        |> Enum.map(fn {t, opts} ->
+             id = opts[:id] |> String.to_atom
+             properties = new_components |> Keyword.get(id, nil)
+             case properties do
+               nil -> {t, opts}
+               properties -> {t, update_opts(opts, properties)}
+             end
+          {t, component_opts, opts} ->
+            id = component_opts[:id] |> String.to_atom
+            properties = new_components |> Keyword.get(id, nil)
+            case properties do
+              nil -> {t, component_opts, opts}
+              properties  -> {t, component_opts, update_opts(opts, properties)}
+            end
+        end)
       end
 
       defp raw_components(components) do
@@ -163,7 +174,8 @@ defmodule Quetzal.LiveView do
 
   ## Example:
 
-      update_components(Quetzal.Graph.graph [id: "mypiegraph"], [type: "pie", labels: ["RED", "BLUE"], values: [20, 10]])
+      components = [mypiegraph: [labels: ["Black", "White", "Gray"], values: [black, white, gray]]]
+      update_components(components) 
 
   """ 
   def update_components(components) do
