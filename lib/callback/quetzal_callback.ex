@@ -1,6 +1,8 @@
 defmodule Quetzal.Callback do
   use GenServer
 
+  require Logger
+
   def start_link(_) do
     GenServer.start_link(__MODULE__, [], name: Quetzal.Callback)
   end
@@ -27,8 +29,12 @@ defmodule Quetzal.Callback do
     |> Enum.map(fn fun ->
          try do
            :erlang.apply(mod, fun, args)
-         catch
-           _error -> {:error, :no_callback_matches}
+         rescue
+           error ->
+             Logger.error "Quetzal.Callback Error trying to apply:\n" <>
+               "#{inspect mod}:#{inspect fun}(#{inspect args})\n" <>
+               "caused by: #{inspect error}"
+             {:error, error}
          end
     end)
     {:reply, output, state}

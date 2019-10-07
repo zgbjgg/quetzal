@@ -86,7 +86,7 @@ defmodule Quetzal.LiveView do
         # and allow delivery to custom definition implemented
         eval = :gen_server.call(Quetzal.Callback, {:dispatch, unquote(opts), event, params})
         socket = case eval do
-          {:error, :no_callback_matches}  ->
+          {:error, _error}  ->
             socket
           [{outputs, component, properties}] ->
             # change property in component so we can assign items again to
