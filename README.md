@@ -36,8 +36,8 @@ defmodule AppWeb.PieLive do
   use Quetzal.LiveView
 
   @impl Quetzal.LiveView
-  def components() do
-    Quetzal.Graph.graph [id: "my-pie-graph"], [type: "pie", labels: ["RED", "BLUE"], values: [1, 2]]
+  def components(_session) do
+    [{Quetzal.Graph, [id: "mypie"], [type: "pie", labels: ["Red", "Blue"], values: [10, 20]]}]
   end
 end
 ```
@@ -51,20 +51,21 @@ Now, we are going to the real-time cases, let's say we want update our pie graph
 event occurs in the server, so let's define a trigger to make it:
 
 ```elixir
-defmodule AppWeb.PieLive
+defmodule AppWeb.PieLive do
   use Quetzal.LiveView
 
   @impl Quetzal.LiveView
-  def components() do
-    Quetzal.Graph.graph [id: "my-pie-graph"], [type: "pie", labels: ["RED", "BLUE"], values: [1, 2]]
+  def components(_session) do
+    [{Quetzal.Graph, [id: "mypie"], [type: "pie", labels: ["Red", "Blue"], values: [10, 20]]}]
   end
 
   def trigger_update() do
     :timer.sleep(5000)
-    r = :rand.uniform(100)
-    b = :rand.uniform(100)
-    component = Quetzal.Graph.graph [id: "TEST"], [type: "pie", labels: ["RED", "BLUE"], values: [r, b]]
-    update_components(component)
+    white = :rand.uniform(100)
+    black = :rand.uniform(100)
+    gray = :rand.uniform(100)
+    components = [mypie: [labels: ["Black", "White", "Gray"], values: [black, white, gray]]]
+    update_components(components)
     trigger_update()
   end
 end
@@ -105,15 +106,15 @@ defmodule AppWeb.LiveView do
     callbacks: [:update_output_div]
 
   @impl Quetzal.LiveView
-  def components() do
+  def components(_session) do
     [{Quetzal.Form, [id: "myform", name: "myform",
-       children: [{Quetzal.InputText, [id: "mytext", value: "", type: "text", name: "mytext"]}]
+       children: [{Quetzal.InputText, [id: "mytext", value: "", name: "mytext"]}]
      ]},
     {Quetzal.Div, [id: "mydiv", style: "", children: ""]}]
   end
 
-  def update_output_div("myform", "mytext", value) do
-    {["You've entered #{value} value", "border-style: dotted;"], "mydiv", [:children, :style]}
+  def update_output_div("myform", "mytext", [value]) do
+    [mydiv: [children: "You've entered #{value} value in the first input"]]
   end
 end
 ```
@@ -125,7 +126,7 @@ In the components we are defining a single form with an input and a div, so when
 input the live view server will send an update to the view and render the new children for the div.
 
 The callbacks receive always 3 arguments, the first is the name of the form containing the components firing the event,
-the second is the match against the component changed and the third is the value of that component.
+the second is the match against the component changed and the third is the value of all components in the form.
 
 ## Notes
 
