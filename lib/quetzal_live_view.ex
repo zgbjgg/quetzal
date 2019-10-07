@@ -88,21 +88,23 @@ defmodule Quetzal.LiveView do
         socket = case eval do
           {:error, _error}  ->
             socket
-          [{outputs, component, properties}] ->
+          outputs when is_list(eval) ->
             # change property in component so we can assign items again to
             # allow live view server performs an update
             components = socket.assigns[:components]
             |> Enum.map(fn {t, opts} ->
-                 id = opts[:id]
-                 case id == component do
-                   true  -> {t, update_opts(opts, properties, outputs)}
-                   false -> {t, opts}
+                 id = opts[:id] |> String.to_atom
+                 properties = outputs |> Keyword.get(id, nil)
+                 case properties do
+                   nil -> {t, opts}
+                   properties -> {t, update_opts(opts, properties)}
                  end
               {t, component_opts, opts} ->
-                id = component_opts[:id]
-                case id == component do
-                  true  -> {t, component_opts, update_opts(opts, properties, outputs)}
-                  false -> {t, component_opts, opts}
+                id = component_opts[:id] |> String.to_atom
+                properties = outputs |> Keyword.get(id, nil)
+                case properties do
+                  nil -> {t, component_opts, opts}
+                  properties  -> {t, component_opts, update_opts(opts, properties)}
                 end
             end)
 
@@ -144,11 +146,10 @@ defmodule Quetzal.LiveView do
         end)
       end
 
-      defp update_opts(opts, properties, outputs) do
-        opts_to_update = Enum.zip(properties, outputs)
+      defp update_opts(opts, properties) do
         opts
         |> Enum.map(fn {property, output} ->
-          {property, opts_to_update |> Keyword.get(property, output)}
+          {property, properties |> Keyword.get(property, output)}
         end)
       end
     end
