@@ -144,7 +144,7 @@ defmodule Quetzal.LiveView do
         # since components are passed trough a single config, mask it as html tags
         components
         |> Enum.map(fn {render, options} ->
-             options = case Keyword.keyword?(options) do
+             options = case are_valid_component?(options) do
                true  -> raw_components(options)
                false -> options
              end
@@ -162,6 +162,13 @@ defmodule Quetzal.LiveView do
         |> Enum.map(fn {property, output} ->
           {property, properties |> Keyword.get(property, output)}
         end)
+      end
+
+      defp are_valid_component?([{Quetzal.Graph, _, _} | next]), do: are_valid_component?(next)
+      defp are_valid_component?([{_, _} | next]), do: are_valid_component?(next)
+      defp are_valid_component?([]), do: true
+      defp are_valid_component?(_) do
+        false
       end
     end
   end
