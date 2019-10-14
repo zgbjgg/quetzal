@@ -13,6 +13,7 @@ defmodule Quetzal.Callback do
   end
 
   @impl true
+  def handle_call({:dispatch, _opts, _event, []}, _from, state), do: {:reply, [], state}
   def handle_call({:dispatch, opts, event, params}, _from, state) do
     # get target changed and get its value from params
     [target|_] = params
