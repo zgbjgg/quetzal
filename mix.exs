@@ -1,12 +1,12 @@
 defmodule Quetzal.MixProject do
   use Mix.Project
 
-  @version "0.1.3"
+  @version "0.1.6"
 
   def project do
     [
       app: :quetzal,
-      version: "0.1.5",
+      version: @version,
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       package: package(),
