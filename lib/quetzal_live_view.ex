@@ -72,14 +72,24 @@ defmodule Quetzal.LiveView do
       end
 
       def mount(session, socket) do
-        Registry.register(Quetzal.Registry, "PID", [])
+        {app, components} = case components(session) do
+          {app, components} -> {app, components}
+          components        -> {UUID.uuid1(), components}
+        end
 
-        socket = socket
-        |> assign(:components, components(session))
-        |> assign(:raw_components, """
-            #{raw_components(components(session))}
-          """)
-        {:ok, socket}
+        case app do
+          app when is_binary(app) ->
+            Registry.register(Quetzal.Registry, app, [])
+
+            socket = socket
+            |> assign(:components, components)
+            |> assign(:raw_components, """
+                 #{raw_components(components)}
+               """)
+            {:ok, socket}
+          app ->
+            raise "App should be a String or binary, #{inspect app} was provided."
+        end
       end
 
       def handle_event(event, params, socket) do
@@ -185,8 +195,8 @@ defmodule Quetzal.LiveView do
       update_components(components) 
 
   """ 
-  def update_components(components) do
-    Registry.dispatch(Quetzal.Registry, "PID", fn entries ->
+  def update_components(app, components) do
+    Registry.dispatch(Quetzal.Registry, app, fn entries ->
       entries
       |> Enum.each(fn {pid, _} ->
            send(pid, {:upgrade, components})
