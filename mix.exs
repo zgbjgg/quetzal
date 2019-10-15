@@ -30,6 +30,7 @@ defmodule Quetzal.MixProject do
     [
       {:jason, "~> 1.1"},
       {:phoenix_live_view, "~> 0.3.0"},
+      {:uuid, "~> 1.1"},
       {:ex_doc, "~> 0.20", only: :docs}
     ]
   end
