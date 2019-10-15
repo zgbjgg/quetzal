@@ -32,7 +32,7 @@ defmodule Quetzal do
 
         @impl Quetzal.LiveView
         def components(_session) do
-          [{Quetzal.Graph, [id: "mypie"], [type: "pie", labels: ["Red", "Blue"], values: [10, 20]]}]
+          {"MyApp", [{Quetzal.Graph, [id: "mypie"], [type: "pie", labels: ["Red", "Blue"], values: [10, 20]]}]}
         end
       end
 
@@ -49,16 +49,14 @@ defmodule Quetzal do
 
         @impl Quetzal.LiveView
         def components(_session) do
-          [{Quetzal.Graph, [id: "mypie"], [type: "pie", labels: ["Red", "Blue"], values: [10, 20]]}]
+          {"MyApp", [{Quetzal.Graph, [id: "mypie"], [type: "pie", labels: ["Red", "Blue"], values: [10, 20]]}]}
         end
 
         def trigger_update() do
           :timer.sleep(5000)
-          white = :rand.uniform(100)
-          black = :rand.uniform(100)
-          gray = :rand.uniform(100)
-          components = [mypie: [labels: ["Black", "White", "Gray"], values: [black, white, gray]]]
-          update_components(components)
+          newvalues = for _n <- 1..3, do: :rand.uniform(100)
+          components = [mypie: [labels: ["Black", "White", "Gray"], values: newvalues]]
+          update_components("MyApp", components)
           trigger_update()
         end
       end

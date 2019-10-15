@@ -37,7 +37,7 @@ defmodule AppWeb.PieLive do
 
   @impl Quetzal.LiveView
   def components(_session) do
-    [{Quetzal.Graph, [id: "mypie"], [type: "pie", labels: ["Red", "Blue"], values: [10, 20]]}]
+    {"MyApp", [{Quetzal.Graph, [id: "mypie"], [type: "pie", labels: ["Red", "Blue"], values: [10, 20]]}]}
   end
 end
 ```
@@ -56,7 +56,7 @@ defmodule AppWeb.PieLive do
 
   @impl Quetzal.LiveView
   def components(_session) do
-    [{Quetzal.Graph, [id: "mypie"], [type: "pie", labels: ["Red", "Blue"], values: [10, 20]]}]
+    {"MyApp", [{Quetzal.Graph, [id: "mypie"], [type: "pie", labels: ["Red", "Blue"], values: [10, 20]]}]}
   end
 
   def trigger_update() do
@@ -65,7 +65,7 @@ defmodule AppWeb.PieLive do
     black = :rand.uniform(100)
     gray = :rand.uniform(100)
     components = [mypie: [labels: ["Black", "White", "Gray"], values: [black, white, gray]]]
-    update_components(components)
+    update_components("MyApp", components)
     trigger_update()
   end
 end
