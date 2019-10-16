@@ -134,17 +134,25 @@ defmodule Quetzal.LiveView do
         |> Enum.map(fn {t, opts} ->
              id = opts[:id] |> String.to_atom
              properties = new_components |> Keyword.get(id, nil)
-             case properties do
+             {t, opts} = case properties do
                nil -> {t, opts}
                properties -> {t, update_opts(opts, properties)}
              end
-          {t, component_opts, opts} ->
-            id = component_opts[:id] |> String.to_atom
-            properties = new_components |> Keyword.get(id, nil)
-            case properties do
-              nil -> {t, component_opts, opts}
-              properties  -> {t, component_opts, update_opts(opts, properties)}
-            end
+             with [child|_]=children <- Keyword.get(opts, :children, nil),
+               new_children <- render_new_components(children, new_components)
+             do
+               {t, opts |> Keyword.replace!(:children, new_children)}
+             else
+               nil -> {t, opts}
+               _children -> {t, opts}
+             end
+           {t, component_opts, opts} ->
+             id = component_opts[:id] |> String.to_atom
+             properties = new_components |> Keyword.get(id, nil)
+             case properties do
+               nil -> {t, component_opts, opts}
+               properties  -> {t, component_opts, update_opts(opts, properties)}
+             end
         end)
       end
 
