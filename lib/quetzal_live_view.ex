@@ -104,7 +104,7 @@ defmodule Quetzal.LiveView do
             |> render_new_components(outputs)
 
             socket
-            |> assign(:state, {event, params})
+            |> assign(:state, {event, params |> Map.delete("_target")})
             |> assign(:components, components)
             |> assign(:raw_components, """
                 #{raw_components(components)}
