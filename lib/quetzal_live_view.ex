@@ -32,7 +32,7 @@ defmodule Quetzal.LiveView do
 
   You can use the graph and other components to extend your views with custom graphs, tables, etc.
 
-  Also is possible upgrade the components from the server live view, use `update_components/1` over your live view:
+  Also is possible upgrade the components from the server live view, use `update_components/2` over your live view:
 
   ## Example:
 
@@ -104,6 +104,7 @@ defmodule Quetzal.LiveView do
             |> render_new_components(outputs)
 
             socket
+            |> assign(:state, {event, params})
             |> assign(:components, components)
             |> assign(:raw_components, """
                 #{raw_components(components)}
@@ -112,6 +113,10 @@ defmodule Quetzal.LiveView do
             socket # there is some error thrown by callback
         end
         {:noreply, socket}
+      end
+
+      def handle_call(:state, _from, socket) do
+        {:reply, socket.assigns[:state], socket}
       end
 
       def handle_info({:upgrade, new_components}, socket) do
@@ -198,15 +203,49 @@ defmodule Quetzal.LiveView do
   ## Example:
 
       components = [mypiegraph: [labels: ["Black", "White", "Gray"], values: [black, white, gray]]]
-      update_components(components) 
+      update_components("MyApp", components)
 
-  """ 
-  def update_components(app, components) do
+  """
+  def update_components(app, components, pids \\ []) do
     Registry.dispatch(Quetzal.Registry, app, fn entries ->
       entries
       |> Enum.each(fn {pid, _} ->
-           send(pid, {:upgrade, components})
+           case pids do
+             [] ->
+               send(pid, {:upgrade, components})
+             pids ->
+               with true <- Enum.member?(pids, pid)
+               do
+                 send(pid, {:upgrade, components})
+               else
+                 false -> :ok
+               end
+           end
       end)
     end) 
+  end
+
+  @doc """
+  Returns a key/value pairs for each process in registry connected to the live view socket.
+  It's used to update components conditionally instead of broadcasting the same for all processes.
+
+  ## Example:
+
+     iex(1)> AppWeb.StateLiveView.state("MyApp")
+     [
+       {#PID<0.491.0>,
+         {"myform", %{"_target" => ["mytext"], "mytext" => "halo", "mytext2" => ""}}},
+       {#PID<0.513.0>,
+         {"myform", %{"_target" => ["mytext"], "mytext" => "jalin", "mytext2" => ""}}}
+     ]
+
+  In the example there are two process connected but with different states loaded so update will be
+  applied only for one of them.
+  """
+  def state(app) do
+    Registry.lookup(Quetzal.Registry, app)
+    |> Enum.map(fn {pid, _value} ->
+         {pid, GenServer.call(pid, :state)}
+    end)
   end
 end
