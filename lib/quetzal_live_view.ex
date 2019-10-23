@@ -231,13 +231,15 @@ defmodule Quetzal.LiveView do
 
   ## Example:
 
+     ```
      iex(1)> AppWeb.StateLiveView.state("MyApp")
      [
        {#PID<0.491.0>,
-         {"myform", %{"_target" => ["mytext"], "mytext" => "halo", "mytext2" => ""}}},
+         {"myform", %{"_target" => ["mytext"], "mytext" => "hello", "mytext2" => ""}}},
        {#PID<0.513.0>,
-         {"myform", %{"_target" => ["mytext"], "mytext" => "jalin", "mytext2" => ""}}}
+         {"myform", %{"_target" => ["mytext"], "mytext" => "hola", "mytext2" => ""}}}
      ]
+     ```
 
   In the example there are two process connected but with different states loaded so update will be
   applied only for one of them.
