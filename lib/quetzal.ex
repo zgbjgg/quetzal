@@ -68,7 +68,7 @@ defmodule Quetzal do
   Then every 5 ms a random numbers will be generated and put into values of the pie graph, and the
   pie graph will be updated, nice eh?.
 
-  To achieve this, Quetzal uses the `update_components/1` function to render the new content, also
+  To achieve this, Quetzal uses the `update_components/2` function to render the new content, also
   you need configure the javascript hooks, only pass the hooks into the live socket connection:
 
       ...
