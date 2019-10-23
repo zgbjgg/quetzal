@@ -129,7 +129,7 @@ defmodule Quetzal do
           "phoenix": "file:../deps/phoenix",
           "phoenix_html": "file:../deps/phoenix_html",
           "phoenix_live_view": "file:../deps/phoenix_live_view",
-          "quetzal_hooks": "file:../../quetzal"
+          "quetzal_hooks": "file:../deps/quetzal"
         },
         ...
 
