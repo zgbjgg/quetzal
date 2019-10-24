@@ -1,6 +1,6 @@
 defmodule Quetzal.Form do
   @moduledoc """
-  Renders an html form as component with the change event as id.
+  Renders an html form as component.
 
   # Example
 
