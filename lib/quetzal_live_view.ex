@@ -92,7 +92,12 @@ defmodule Quetzal.LiveView do
 
       def handle_event(event, params, socket) do
         # instead delivery to callback, send a message to callback process
-        # and allow delivery to custom definition implemented
+        # and allow delivery to custom definition implemented, if the params target is missing set
+        # the same as event so avoid crash from callback handler
+        params = case Map.get(params, "_target") == nil do
+          true -> params |> Map.put("_target", [event])
+          false -> params
+        end
         eval = :gen_server.call(Quetzal.Callback, {:dispatch, unquote(opts), event, params})
         socket = case eval do
           {:error, _error}  ->
