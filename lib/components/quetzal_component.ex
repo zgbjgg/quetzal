@@ -7,19 +7,24 @@ defmodule Quetzal.Component do
   built-in custom tags for events or tagging html components, also you
   can pass keywords as options to render into the tag.
 
+  Special tags are: `change`, `keyup`, `keydown`, `target`, `submit`, `click`,
+    `focus`, and `blur`. We decide set this available so we can handle `phx` events and
+  all components using the behaviour will contain this tags by default and apply
+  them if found into tags when rendering the component.
+
   ## Example:
 
   Create an input text to capture an string:
 
       defmodule MyComponent.Text do
         use Quetzal.Component,
-          tag: "input"
+          tag: "input",
           type: "text"
       end
 
   And let's use in this way:
 
-      iex(10)> MyComponent.Text.html_tag([id: "mytext"])
+      iex(10)> MyComponent.Text.html_tag([id: "mytext", change: "mytext"])
       "<input id=\"mytext\" type=\"text\" phx-change=\"mytext\"></input>"
   """
 
@@ -34,6 +39,7 @@ defmodule Quetzal.Component do
       @tag_close ">"
       @tag_open_slash "</"
       @tag_close_slash "/>"
+      @event_tags [:change, :keyup, :keydown, :target, :submit, :click, :focus, :blur]
 
       @impl unquote(__MODULE__)
       def render(options) do
@@ -43,10 +49,6 @@ defmodule Quetzal.Component do
         tag = if opts[:tag] == nil do :missing else opts[:tag] end
         type = if opts[:type] == nil do "" else opts[:type] end
 
-        # those are events for keyup, be careful when using it, not supported all features
-        keyup = opts[:keyup]
-        target = opts[:target]
-
         case tag do
           :missing -> raise "Missing tag, a component should contain valid html tag into keyword options."
           _        ->
@@ -54,9 +56,18 @@ defmodule Quetzal.Component do
             children = Keyword.get(options, :children, "")
 
             options = options
-            |> Keyword.put(:"phx-keyup", keyup)
-            |> Keyword.put(:"phx-target", target)
-            |> Keyword.put(:"phx-change", options[:id])
+            |> Enum.map(fn {opt, value} ->
+                 with true <- Enum.member?(@event_tags, opt)
+                 do
+                   opt = opt
+                   |> Atom.to_string
+                   |> (fn opt -> "phx-#{opt}" end).()
+                   |> String.to_atom
+                   {opt, value}
+                 else
+                   false -> {opt, value}
+                 end
+            end)
             |> Keyword.put(:type, type)
             |> Keyword.delete(:children)
             |> Enum.map(fn {_, nil} ->
