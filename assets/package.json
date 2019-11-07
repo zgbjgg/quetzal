@@ -1,6 +1,6 @@
 {
   "name": "quetzal_hooks",
-  "version": "0.1.5",
+  "version": "0.1.12",
   "description": "The Quetzal Hooks definitions.",
   "license": "MIT",
   "main": "./priv/static/quetzal_hooks.js",

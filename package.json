@@ -1,6 +1,6 @@
 {
   "name": "quetzal",
-  "version": "0.1.0",
+  "version": "0.1.12",
   "description": "The Quetzal LiveView JavaScript hooks definitions.",
   "license": "MIT",
   "main": "./priv/static/quetzal_hooks.js",
