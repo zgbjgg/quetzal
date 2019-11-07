@@ -98,7 +98,7 @@ defmodule Quetzal.LiveView do
           true -> params |> Map.put("_target", [event])
           false -> params
         end
-        eval = :gen_server.call(Quetzal.Callback, {:dispatch, unquote(opts), event, params})
+        eval = :gen_server.call(Quetzal.Callback, {:dispatch, unquote(opts), event, params}, :infinity)
         socket = case eval do
           {:error, _error}  ->
             socket
