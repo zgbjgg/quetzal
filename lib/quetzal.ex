@@ -1,6 +1,6 @@
 defmodule Quetzal do
   @moduledoc """
-  Quetzal - Analytical web apps, beautiful, fast, easy and real-time using Elixir. No Javascript required.
+  Quetzal - Analytical web apps, fast, easy and real-time using Elixir. No Javascript required.
 
   Quetzal provides easy and fast tools to make analytical web apps with real-time updates.
 

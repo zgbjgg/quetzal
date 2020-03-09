@@ -13,7 +13,7 @@ defmodule Quetzal.MixProject do
       deps: deps(),
       docs: docs(),
       description: """
-      Analytical web apps, beautiful, fast, easy and real-time using Elixir. No Javascript required.
+      Analytical web apps, fast, easy and real-time using Elixir. No Javascript required.
       """
     ]
   end
