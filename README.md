@@ -3,6 +3,8 @@
 **Quetzal - Analytical web apps, fast, easy and real-time using Elixir. No Javascript required.**
 
 [![Hex.pm](https://img.shields.io/hexpm/v/quetzal.svg)](https://hex.pm/packages/quetzal)
+[![Hex.pm](https://img.shields.io/hexpm/dt/quetzal.svg)](https://hex.pm/packages/quetzal)
+[![Hex.pm](https://img.shields.io/hexpm/dw/quetzal.svg)](https://hex.pm/packages/quetzal)
 
 Quetzal provides easy and fast tools to make analytical web apps with real-time updates.
 
